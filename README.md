@@ -4,16 +4,16 @@ IHC class project
 ```
 cd ihc-app
 python3 -m venv venv
-pip3 install -r requirements.txt
 source venv/bin/activate
+pip3 install -r requirements.txt
 FLASK_APP=webapp.py flask run
 ```
 ####How to use in Windows :
 ```
 cd ihc-app
 python3 -m venv venv
-pip3 install -r requirements.txt
 venv/bin/activate.bat
+pip3 install -r requirements.txt
 set FLASK_APP=webapp.py
 flask run
 ```
