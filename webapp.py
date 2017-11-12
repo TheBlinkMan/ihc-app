@@ -1,6 +1,6 @@
 import os
 from app import create_app, db
-from app.models import User
+from app.models import User, Role
 from flask import request, abort
 import click
 
@@ -13,7 +13,7 @@ def only_json():
 
 @app.shell_context_processor
 def make_shell_context():
-    return dict(app=app, db=db, User=User)
+    return dict(app=app, db=db, User=User, Role=Role)
 
 @app.cli.command()
 @click.option('--coverage/--no-coverage', default=False, help='Enable code coverage')
