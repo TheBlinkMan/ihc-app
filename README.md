@@ -17,3 +17,13 @@ pip3 install -r requirements.txt
 set FLASK_APP=webapp.py
 flask run
 ```
+####How to create the database:
+```
+FLASK_APP=webapp.py flask shell
+```
+######Within the shell, type the following commands:
+```
+db.create_all()
+Role.insert_roles()
+quit()
+```
