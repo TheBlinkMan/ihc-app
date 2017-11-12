@@ -1,7 +1,7 @@
 import unittest
 import json
 from app import create_app, db
-from app.models import User
+from app.models import User, Role
 
 class UserModelTestCase(unittest.TestCase):
 
@@ -10,7 +10,7 @@ class UserModelTestCase(unittest.TestCase):
         self.app_context = self.app.app_context()
         self.app_context.push()
         db.create_all()
-        self.client = self.app.test_client()
+        Role.insert_roles()
 
     def tearDown(self):
         db.session.remove()
@@ -42,10 +42,13 @@ class UserModelTestCase(unittest.TestCase):
         self.assertTrue(user1.password_hash != user2.password_hash)
 
     def test_to_json(self):
-        user = User(email='john.doe@latte.au.au', password='simple')
+        #get a random role so the method to_json can be called without raising
+        # an exception.
+        role = Role.query.first()
+        user = User(email='john.doe@latte.au.au', password='simple', role=role)
         db.session.add(user)
         db.session.commit()
         json_user = user.to_json()
-        expected_keys = ['url', 'name', 'email', 'lattes']
+        expected_keys = ['url', 'name', 'email', 'lattes', 'role']
         self.assertEqual(sorted(json_user.keys()), sorted(expected_keys))
         self.assertTrue('api/v1.0/users/' in json_user['url'])

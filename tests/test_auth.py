@@ -1,7 +1,7 @@
 import unittest
 import json
 from app import create_app, db
-from app.models import User
+from app.models import User, Role
 from flask import url_for
 
 class AuthTestCase(unittest.TestCase):
@@ -11,6 +11,7 @@ class AuthTestCase(unittest.TestCase):
         self.app_context = self.app.app_context()
         self.app_context.push()
         db.create_all()
+        Role.insert_roles()
         self.client = self.app.test_client()
 
     def tearDown(self):
@@ -98,11 +99,14 @@ class AuthTestCase(unittest.TestCase):
     def test_token_authentication(self):
         email = 'john.doe3@something.com.zz'
         password = 'simple'
+        #get a random role
+        role = Role.query.first()
         user = User()
         user.name = 'John Doe 3'
         user.email = email
         user.lattes = 'http://late.au.au'
         user.password = password
+        user.role = role
 
         db.session.add(user)
         db.session.commit()

@@ -1,3 +1,4 @@
+import re
 from . import db
 from werkzeug.security import generate_password_hash, check_password_hash
 from . import login_manager
@@ -5,6 +6,25 @@ from flask_login import current_user, AnonymousUserMixin
 from itsdangerous import TimedJSONWebSignatureSerializer as Serializer
 from flask import url_for, current_app
 from .exceptions import ValidationError
+
+INSTITUTIONAL_EMAIL_REGEX = re.compile(r"(^[a-zA-Z0-9_.+-]+@[estudante\.]?ifb\.edu\.br$)")
+STUDENT_EMAIL_REGEX = re.compile(r"(^[a-zA-Z0-9_.+-]+@estudante\.ifb\.edu\.br$)")
+TEACHER_EMAIL_REGEX = re.compile(r"(^[a-zA-Z0-9_.+-]+@ifb\.edu\.br$)")
+
+def is_email_address_institutional(email):
+    if INSTITUTIONAL_EMAIL_REGEX.match(email): # will return True or None
+        return True
+    return False
+
+def get_role_by_email(email):
+    if STUDENT_EMAIL_REGEX.match(email):
+        return Role.query.filter_by(name = 'Student').first()
+    #(TODO)
+    #Add here a string test to give the administrator role to the right emails
+    elif TEACHER_EMAIL_REGEX.match(email):
+        return Role.query.filter_by(name = 'Teacher').first()
+    else:
+        return None
 
 class User(db.Model):
     __tablename__ = 'users'
@@ -49,12 +69,13 @@ class User(db.Model):
         lattes = json_user.get('lattes')
         if name == '' or email == '' or password == '':
             raise ValidationError('Invalid parameters')
-        #Validade email with Felipe's funciton and decide the user role
-        #This function will evaluate if the e-mail is a institutional email or not
         user = User.query.filter_by(email = email).first()
         if user is not None:
             raise ValidationError('User already registered.')
+        if not is_email_address_institutional(email):
+            raise ValidationError('Email address is not institutional.')
         u = User()
+        u.role = get_role_by_email(email)
         u.name = name
         u.email = email
         u.password = password
@@ -66,6 +87,7 @@ class User(db.Model):
                 'url': url_for('api.get_user', id=self.id, _external=True),
                 'name': self.name,
                 'email': self.email,
+                'role': self.role.name,
                 'lattes': self.lattes
         }
         return json_user
