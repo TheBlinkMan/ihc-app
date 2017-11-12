@@ -27,3 +27,7 @@ db.create_all()
 Role.insert_roles()
 quit()
 ```
+####How to run the tests:
+```
+FLASK_APP=webapp.py flask test
+```
