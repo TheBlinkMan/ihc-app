@@ -14,6 +14,7 @@ class User(db.Model):
     email = db.Column(db.String(64), unique=True, index=True)
     password_hash = db.Column(db.String(128))
     lattes = db.Column(db.String(256), unique=True, index=True)
+    role_id = db.Column(db.Integer, db.ForeignKey('roles.id'))
 
     @property
     def password(self):
@@ -80,3 +81,37 @@ login_manager.anonymous_user = AnonymousUser
 @login_manager.user_loader
 def load_user(user_id):
     return User.query.get(int(user_id))
+
+class Permission:
+    WRITE_CONTENT = 0x01 #create content
+    REVIEW_CONTENT = 0x02 #Can review student's content
+    PUBLISH_CONTENT = 0x04
+    ADMINISTER = 0x80 #delete news and update user's accounts
+
+class Role(db.Model):
+    __tablename__ = 'roles'
+
+    id = db.Column(db.Integer, primary_key = True)
+    name = db.Column(db.String(64))
+    permissions = db.Column(db.Integer)
+    users = db.relationship('User', backref = 'role', lazy = 'dynamic')
+
+    @staticmethod
+    def insert_roles():
+        roles = {
+            'Student': Permission.WRITE_CONTENT,
+            'Teacher': (Permission.WRITE_CONTENT |
+                        Permission.REVIEW_CONTENT |
+                        Permission.PUBLISH_CONTENT),
+            'Administrator': 0xff
+        }
+        for r in roles:
+            role =  Role.query.filter_by(name = r).first()
+            if role is None:
+                role = Role(name = r)
+            role.permissions = roles[r]
+            db.session.add(role)
+        db.session.commit()
+
+    def __repr__(self):
+        return '<Role %r>' % self.name
