@@ -1,7 +1,7 @@
 import unittest
 import json
 from app import create_app, db
-from app.models import User, Role
+from app.models import User, AnonymousUser, Role, Permission
 
 class UserModelTestCase(unittest.TestCase):
 
@@ -52,3 +52,30 @@ class UserModelTestCase(unittest.TestCase):
         expected_keys = ['url', 'name', 'email', 'lattes', 'role']
         self.assertEqual(sorted(json_user.keys()), sorted(expected_keys))
         self.assertTrue('api/v1.0/users/' in json_user['url'])
+
+    def test_permissions(self):
+        user = User()
+        user.role = Role.query.filter_by(name = 'Student').first()
+        self.assertTrue(user.can(Permission.WRITE_CONTENT))
+        self.assertFalse(user.can(Permission.REVIEW_CONTENT))
+        self.assertFalse(user.can(Permission.PUBLISH_CONTENT))
+        self.assertFalse(user.is_administrator())
+
+        user.role = Role.query.filter_by(name = 'Teacher').first()
+        self.assertTrue(user.can(Permission.WRITE_CONTENT |
+                              Permission.REVIEW_CONTENT |
+                              Permission.PUBLISH_CONTENT))
+        self.assertFalse(user.is_administrator())
+
+        user.role = Role.query.filter_by(name = 'Administrator').first()
+        self.assertTrue(user.can(Permission.WRITE_CONTENT |
+                              Permission.REVIEW_CONTENT |
+                              Permission.PUBLISH_CONTENT))
+        self.assertTrue(user.is_administrator())
+
+    def test_anonymous_user_permissions(self):
+        user = AnonymousUser()
+        self.assertFalse(user.can(Permission.WRITE_CONTENT))
+        self.assertFalse(user.can(Permission.REVIEW_CONTENT))
+        self.assertFalse(user.can(Permission.PUBLISH_CONTENT))
+        self.assertFalse(user.is_administrator())

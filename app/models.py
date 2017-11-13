@@ -61,6 +61,13 @@ class User(db.Model):
             return None
         return User.query.get(data['id'])
 
+    def can(self, permissions):
+        return self.role is not None and \
+            (self.role.permissions & permissions) == permissions
+
+    def is_administrator(self):
+        return self.can(Permission.ADMINISTER)
+
     @staticmethod
     def from_json(json_user):
         name = json_user.get('name')
@@ -96,7 +103,11 @@ class User(db.Model):
         return '<User %r>' % self.email
 
 class AnonymousUser(AnonymousUserMixin):
-    pass
+    def can(self, permissions):
+        return False
+
+    def is_administrator(self):
+        return False
 
 login_manager.anonymous_user = AnonymousUser
 
