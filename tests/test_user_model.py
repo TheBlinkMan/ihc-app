@@ -49,7 +49,7 @@ class UserModelTestCase(unittest.TestCase):
         db.session.add(user)
         db.session.commit()
         json_user = user.to_json()
-        expected_keys = ['uri', 'name', 'email', 'lattes', 'confirmed', 'role']
+        expected_keys = ['uri', 'id', 'name', 'email', 'lattes', 'confirmed', 'role']
         self.assertEqual(sorted(json_user.keys()), sorted(expected_keys))
         self.assertTrue('api/v1.0/users/' in json_user['uri'])
 

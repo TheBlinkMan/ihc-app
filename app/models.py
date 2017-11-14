@@ -99,6 +99,7 @@ class User(db.Model):
     def to_json(self):
         json_user = {
                 'uri': url_for('api.get_user', id=self.id, _external=True),
+                'id': self.id,
                 'name': self.name,
                 'email': self.email,
                 'role': self.role.name,
