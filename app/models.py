@@ -40,6 +40,7 @@ class User(db.Model):
     email = db.Column(db.String(64), unique=True, index=True)
     password_hash = db.Column(db.String(128))
     lattes = db.Column(db.String(256), unique=True, index=True)
+    confirmed = db.Column(db.Boolean, default = False)
     role_id = db.Column(db.Integer, db.ForeignKey('roles.id'))
 
     @property
@@ -97,10 +98,11 @@ class User(db.Model):
 
     def to_json(self):
         json_user = {
-                'url': url_for('api.get_user', id=self.id, _external=True),
+                'uri': url_for('api.get_user', id=self.id, _external=True),
                 'name': self.name,
                 'email': self.email,
                 'role': self.role.name,
+                'confirmed': self.confirmed,
                 'lattes': self.lattes
         }
         return json_user

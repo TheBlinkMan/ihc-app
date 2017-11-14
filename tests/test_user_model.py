@@ -49,9 +49,9 @@ class UserModelTestCase(unittest.TestCase):
         db.session.add(user)
         db.session.commit()
         json_user = user.to_json()
-        expected_keys = ['url', 'name', 'email', 'lattes', 'role']
+        expected_keys = ['uri', 'name', 'email', 'lattes', 'confirmed', 'role']
         self.assertEqual(sorted(json_user.keys()), sorted(expected_keys))
-        self.assertTrue('api/v1.0/users/' in json_user['url'])
+        self.assertTrue('api/v1.0/users/' in json_user['uri'])
 
     def test_permissions(self):
         user = User()
