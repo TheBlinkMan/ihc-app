@@ -4,6 +4,7 @@ from flask import g, jsonify, request, url_for
 from flask_login import current_user
 from .errors import bad_request, unauthorized, forbidden
 from .. import db, auth
+from .decorators import admin_required
 
 @api.route('/users/<int:id>/', methods=['GET'])
 @auth.login_required
@@ -21,3 +22,9 @@ def create_user():
     db.session.commit()
     return jsonify(user.to_json()), 201, \
         {'Location': url_for('api.get_user', id=user.id, _external=True)}
+
+@api.route('/users/', methods=['GET'])
+@auth.login_required
+@admin_required
+def get_users():
+    return jsonify({'users': [user.to_json() for user in User.query.all()]})
