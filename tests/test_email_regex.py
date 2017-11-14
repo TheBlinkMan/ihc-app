@@ -2,6 +2,7 @@ import unittest
 import json
 from app import create_app, db
 from app.models import Role, get_role_by_email, is_email_address_institutional
+from app.models import is_email_address
 
 class EmailRegexTestCase(unittest.TestCase):
 
@@ -25,6 +26,16 @@ class EmailRegexTestCase(unittest.TestCase):
     def test_institutional_regex_with_valid_email(self):
         institutional_email = "name.lastname@ifb.edu.br"
         self.assertTrue(is_email_address_institutional(institutional_email))
+
+    def test_email_regex_with_invalid_email(self):
+        #(TODO) Add more test cases
+        email = "name.lastname@example."
+        self.assertFalse(is_email_address(email))
+
+    def test_email_regex_with_valid_email(self):
+        email = "name.lastname@gmail.edu.br"
+        self.assertTrue(is_email_address(email))
+
 
     def test_role_assignment(self):
         student_role = Role.query.filter_by(name = 'Student').first()
