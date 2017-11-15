@@ -24,6 +24,8 @@ class EmailRegexTestCase(unittest.TestCase):
         self.assertFalse(is_email_address_institutional(email))
 
     def test_institutional_regex_with_valid_email(self):
+        institutional_email = "name.lastname@estudante.ifb.edu.br"
+        self.assertTrue(is_email_address_institutional(institutional_email))
         institutional_email = "name.lastname@ifb.edu.br"
         self.assertTrue(is_email_address_institutional(institutional_email))
 
