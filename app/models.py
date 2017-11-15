@@ -68,6 +68,21 @@ class User(db.Model):
             return None
         return User.query.get(data['id'])
 
+    def generate_confirmation_token(self, expiration=3600):
+        s = Serializer(current_app.config['SECRET_KEY'], expiration)
+        return s.dumps({'confirm': self.id})
+
+    def confirm(self, token):
+        s = Serializer(current_app.config['SECRET_KEY'])
+        try:
+            data = s.loads(token)
+        except:
+            return False
+        if data.get('confirm') != self.id:
+            return False
+        self.confirmed = True
+        return True
+
     def can(self, permissions):
         return self.role is not None and \
             (self.role.permissions & permissions) == permissions
@@ -81,7 +96,8 @@ class User(db.Model):
         email = json_user.get('email')
         password = json_user.get('password')
         lattes = json_user.get('lattes')
-        if name == '' or email == '' or password == '':
+        if (name == '' or email == '' or password == '' or
+           name is None or email is None or password is None):
             raise ValidationError('Invalid parameters')
         user = User.query.filter_by(email = email).first()
         if user is not None:

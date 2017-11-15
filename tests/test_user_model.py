@@ -1,5 +1,6 @@
 import unittest
 import json
+import time
 from app import create_app, db
 from app.models import User, AnonymousUser, Role, Permission
 
@@ -40,6 +41,49 @@ class UserModelTestCase(unittest.TestCase):
         user1.password = 'simple'
         user2.password = 'simple'
         self.assertTrue(user1.password_hash != user2.password_hash)
+
+    def test_valid_confirmation_token(self):
+        user = User()
+        user.name = 'John Doe'
+        user.email = 'john.doe@ifb.edu.br'
+        user.password = 'johndoe123'
+        db.session.add(user)
+        db.session.commit()
+        token = user.generate_confirmation_token()
+        self.assertTrue(user.confirm(token))
+
+    def test_invalid_confirmation_token(self):
+        user1 = User()
+        user1.name  = 'John Doe'
+        user1.email = 'john.doe@ifb.edu.br'
+        user1.password = 'johndoe123'
+
+        user2 = User()
+        user2.name  = 'Jane Doe'
+        user2.email = 'jane.doe@ifb.edu.br'
+        user2.password = 'janedoe123'
+
+        db.session.add(user1)
+        db.session.add(user2)
+        db.session.commit()
+
+        token = user1.generate_confirmation_token()
+        self.assertFalse(user2.confirm(token))
+
+    def test_expired_confirmation_token(self):
+        user = User()
+        user.name  = 'John Doe'
+        user.email = 'john.doe@ifb.edu.br'
+        user.password = 'johndoe123'
+
+        db.session.add(user)
+        db.session.commit()
+
+        token = user.generate_confirmation_token(1)
+
+        time.sleep(2)
+
+        self.assertFalse(user.confirm(token))
 
     def test_to_json(self):
         #get a random role so the method to_json can be called without raising
