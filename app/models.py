@@ -104,6 +104,11 @@ class User(db.Model):
             raise ValidationError('User already registered.')
         if not is_email_address_institutional(email):
             raise ValidationError('Email address is not institutional.')
+        if len(name) < 3:
+            raise ValidationError('Invalid parameters')
+        if len(password) < 8:
+            raise ValidationError('Invalid parameters')
+
         u = User()
         u.role = get_role_by_email(email)
         u.name = name

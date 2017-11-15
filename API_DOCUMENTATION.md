@@ -37,6 +37,7 @@ Status Code: 401
 Status Code: 403
 Content:
 {
+    error : forbidden,
     message : 'Insufficient permissions'
 }
 #### Sample Call
@@ -49,7 +50,7 @@ The user must be logged in and be a administrator
 #### METHOD
     GET
 #### URL Params
-    Integer id
+    [integer] id
 #### Data Params
 #### Success Response
 ##### Header
@@ -83,6 +84,7 @@ Status Code: 403
 Content:
 ```
 {
+    error : forbidden,
     message : 'Insufficient credentials'
 }
 ```
@@ -100,9 +102,9 @@ the user he is trying to access
 #### Data Params
 ```
 {
-    name : [string],
+    name : [string],     (Minimum length 3)
     email : [string],
-    password : [string],
+    password : [string], (Minimum length 8)
     lattes : [string],   (Optional)
 }
 ```
@@ -124,7 +126,7 @@ Content:
 }
 ```
 #### Error Response
-##### If there are missing parameters in the json payload.
+##### If there are missing parameters(or parameters with invalid input) in the json payload.
 
 Status Code: 400
 

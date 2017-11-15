@@ -204,7 +204,7 @@ class UsersTestCase(unittest.TestCase):
             response = self.client.post(
                     url_for('api.create_user'),
                     headers=self.get_headers(''),
-                    data=json.dumps({'name' : '', 'email' : 'john.doe@ifb.edu.br', 'password' : 'john123'}))
+                    data=json.dumps({'name' : '', 'email' : 'john.doe@ifb.edu.br', 'password' : 'john12356'}))
             self.assertTrue(response.status_code == 400)
 
             response = self.client.post(
@@ -216,7 +216,7 @@ class UsersTestCase(unittest.TestCase):
             response = self.client.post(
                     url_for('api.create_user'),
                     headers=self.get_headers(''),
-                    data=json.dumps({'name' : 'John Doe', 'email' : '', 'password' : 'john123'}))
+                    data=json.dumps({'name' : 'John Doe', 'email' : '', 'password' : 'john123456'}))
             self.assertTrue(response.status_code == 400)
 
     def test_create_user_with_registered_email(self):
@@ -237,7 +237,7 @@ class UsersTestCase(unittest.TestCase):
             response = self.client.post(
                     url_for('api.create_user'),
                     headers=self.get_headers(''),
-                    data=json.dumps({'name' : 'Something', 'email' : email, 'password' : 'john123'}))
+                    data=json.dumps({'name' : 'Something', 'email' : email, 'password' : 'john123456'}))
             self.assertTrue(response.status_code == 400)
             json_response = json.loads(response.data.decode('utf-8'))
             self.assertIsNotNone(json_response.get('message'))
@@ -245,7 +245,7 @@ class UsersTestCase(unittest.TestCase):
     def test_create_user_without_intitutional_email(self):
         name = 'John Doe'
         email = 'john.doe@example.com'
-        password = 'john123'
+        password = 'john123456'
 
         with self.client:
             response = self.client.post(
@@ -257,7 +257,7 @@ class UsersTestCase(unittest.TestCase):
     def test_create_user_with_valid_parameters(self):
         name = 'John Doe'
         email = 'john.doe@estudante.ifb.edu.br'
-        password = 'john123'
+        password = 'john123456'
 
         with self.client:
             response = self.client.post(
