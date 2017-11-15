@@ -33,14 +33,6 @@ class UsersTestCase(unittest.TestCase):
                     data=json.dumps({'email': email, 'password': password})
                 )
 
-    def test_users_create_user_with_blank_values(self):
-        with self.client:
-            response = self.client.post(
-                    url_for('api.create_user'),
-                    headers=self.get_headers(''),
-                    data=json.dumps({'email' : '', 'password' : ''}))
-            self.assertTrue(response.status_code == 400)
-
     def test_get_users(self):
         user = User()
         user.name = 'John Doe'
@@ -200,3 +192,76 @@ class UsersTestCase(unittest.TestCase):
             self.assertTrue(response.status_code == 403)
             json_response = json.loads(response.data.decode('utf-8'))
             self.assertIsNotNone(json_response.get('message'))
+
+    def test_create_user_with_blank_values(self):
+        with self.client:
+            response = self.client.post(
+                    url_for('api.create_user'),
+                    headers=self.get_headers(''),
+                    data=json.dumps({'name' : '', 'email' : '', 'password' : ''}))
+            self.assertTrue(response.status_code == 400)
+
+            response = self.client.post(
+                    url_for('api.create_user'),
+                    headers=self.get_headers(''),
+                    data=json.dumps({'name' : '', 'email' : 'john.doe@ifb.edu.br', 'password' : 'john123'}))
+            self.assertTrue(response.status_code == 400)
+
+            response = self.client.post(
+                    url_for('api.create_user'),
+                    headers=self.get_headers(''),
+                    data=json.dumps({'name' : 'John Doe', 'email' : 'john.doe@ifb.edu.br', 'password' : ''}))
+            self.assertTrue(response.status_code == 400)
+
+            response = self.client.post(
+                    url_for('api.create_user'),
+                    headers=self.get_headers(''),
+                    data=json.dumps({'name' : 'John Doe', 'email' : '', 'password' : 'john123'}))
+            self.assertTrue(response.status_code == 400)
+
+    def test_create_user_with_registered_email(self):
+        name = 'John Doe'
+        email = 'john.doe@estudante.ifb.edu.br'
+        password = 'hardtoguessstring'
+        user = User()
+        user.name = name
+        user.email = email
+        user.password = password
+        user.lattes = 'https://lattes.au.au/johndoe'
+        user.role = get_role_by_email(user.email)
+
+        db.session.add(user)
+        db.session.commit()
+
+        with self.client:
+            response = self.client.post(
+                    url_for('api.create_user'),
+                    headers=self.get_headers(''),
+                    data=json.dumps({'name' : 'Something', 'email' : email, 'password' : 'john123'}))
+            self.assertTrue(response.status_code == 400)
+            json_response = json.loads(response.data.decode('utf-8'))
+            self.assertIsNotNone(json_response.get('message'))
+
+    def test_create_user_without_intitutional_email(self):
+        name = 'John Doe'
+        email = 'john.doe@example.com'
+        password = 'john123'
+
+        with self.client:
+            response = self.client.post(
+                    url_for('api.create_user'),
+                    headers=self.get_headers(''),
+                    data=json.dumps({'name' : name, 'email' : email, 'password' : password}))
+            self.assertTrue(response.status_code == 400)
+
+    def test_create_user_with_valid_parameters(self):
+        name = 'John Doe'
+        email = 'john.doe@estudante.ifb.edu.br'
+        password = 'john123'
+
+        with self.client:
+            response = self.client.post(
+                    url_for('api.create_user'),
+                    headers=self.get_headers(''),
+                    data=json.dumps({'name' : name, 'email' : email, 'password' : password}))
+            self.assertTrue(response.status_code == 201)

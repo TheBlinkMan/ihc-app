@@ -17,6 +17,7 @@ Content:
     users : [
     {
         uri : [string],
+        id : [integer],
         name : [string],
         email : [string],
         role : [string],
@@ -89,3 +90,72 @@ Content:
 #### Notes
 The user must be logged in and be a administrator or
 the user he is trying to access
+
+## Create User
+#### URL
+    /users/
+#### METHOD
+    POST
+#### URL Params
+#### Data Params
+```
+{
+    name : [string],
+    email : [string],
+    password : [string],
+    lattes : [string],   (Optional)
+}
+```
+#### Success Response
+##### Header
+Status Code: 201
+Location: /users/id/ -- id of the created user
+
+Content:
+```
+{
+    uri : [string],
+    id : [integer],
+    name : [string],
+    email : [string],
+    role : [string],
+    confirmed : [boolean],
+    lattes : [string]
+}
+```
+#### Error Response
+##### If there are missing parameters in the json payload.
+
+Status Code: 400
+
+Content:
+```
+{
+    error : bad request,
+    message : Invalid parameters
+}
+```
+
+##### If the email is already registered in another account
+
+Status Code: 400
+Content:
+```
+{
+    error : bad request,
+    message : User already registered.
+}
+```
+##### If the email is not institutional
+
+Status Code: 400
+Content:
+```
+{
+    error : bad request,
+    message : Email address is not institutional
+}
+```
+
+#### Sample Call
+#### Notes
