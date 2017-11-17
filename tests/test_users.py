@@ -265,3 +265,68 @@ class UsersTestCase(unittest.TestCase):
                     headers=self.get_headers(''),
                     data=json.dumps({'name' : name, 'email' : email, 'password' : password}))
             self.assertTrue(response.status_code == 201)
+
+    def test_update_user_with_valid_input(self):
+        name = 'John Doe'
+        email = 'john.doe@estudante.ifb.edu.br'
+        password = 'hardtoguessstring'
+        lattes = 'https://lattes.au.au/johndoe'
+
+        user = User()
+        user.name = name
+        user.email = email
+        user.password = password
+        user.lattes = lattes
+        user.role = Role.query.filter_by(name = 'Student').first()
+
+        db.session.add(user)
+        db.session.commit()
+
+        self.assertFalse(user.confirmed)
+
+        confirmation_token = user.generate_confirmation_token()
+        confirmation_token_ascii = confirmation_token.decode('ascii')
+
+        response = self.login(email, password)
+        self.assertTrue(response.status_code == 200)
+        json_response = json.loads(response.data.decode('utf-8'))
+        self.assertIsNotNone(json_response.get('token'))
+        authentication_token = json_response['token']
+
+        with self.client:
+            response = self.client.put(
+                    url_for('api.update_user', id = user.id),
+                    headers=self.get_headers(authentication_token),
+                    data=json.dumps({'confirm' : confirmation_token_ascii})
+            )
+            self.assertTrue(response.status_code == 200)
+            json_response = json.loads(response.data.decode('utf-8'))
+            self.assertIsNotNone(json_response.get('confirmed'))
+            self.assertTrue(json_response.get('confirmed'))
+            self.assertTrue(user.confirmed)
+
+            new_name = 'John Dow'
+
+            response = self.client.put(
+                    url_for('api.update_user', id = user.id),
+                    headers=self.get_headers(authentication_token),
+                    data=json.dumps({'name' : new_name})
+            )
+            self.assertTrue(response.status_code == 200)
+            json_response = json.loads(response.data.decode('utf-8'))
+            self.assertIsNotNone(json_response.get('name'))
+            self.assertTrue(json_response.get('name') != name)
+            self.assertTrue(user.name == new_name)
+
+            new_lattes = 'https://lattes.au.au/johndow'
+
+            response = self.client.put(
+                    url_for('api.update_user', id = user.id),
+                    headers=self.get_headers(authentication_token),
+                    data=json.dumps({'lattes' : new_lattes})
+            )
+            self.assertTrue(response.status_code == 200)
+            json_response = json.loads(response.data.decode('utf-8'))
+            self.assertIsNotNone(json_response.get('lattes'))
+            self.assertTrue(json_response.get('lattes') != lattes)
+            self.assertTrue(user.lattes == new_lattes)
