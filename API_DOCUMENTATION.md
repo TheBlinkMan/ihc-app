@@ -161,6 +161,7 @@ Content:
 
 #### Sample Call
 #### Notes
+
 ## Update User
 #### URL
     /users/<int:id>/
@@ -226,5 +227,43 @@ Content:
 
 Status Code: 404
 
+#### Sample Call
+#### Notes
+
+## Generate Confirmation Token
+#### URL
+    /confirm/
+#### METHOD
+    GET
+#### URL Params
+#### Data Params
+#### Success Response
+##### Header
+Status Code: 200
+
+Content:
+```
+{
+    message : [string]
+}
+```
+##### An email will be sent to the user with the confirmation token.
+#### Error Response
+
+##### If the user does not send the authorization token
+
+Status Code: 401
+
+##### If the user tries to get a confirmation token for an already confirmed account
+
+Status Code: 400
+
+Content:
+```
+{
+    error : bad request,
+    message : User already confirmed this account.
+}
+```
 #### Sample Call
 #### Notes

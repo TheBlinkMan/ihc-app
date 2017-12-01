@@ -1,0 +1,13 @@
+Dear {{ user.name }},
+
+Welcome to IHC-APP!
+
+To confirm your account please enter the following token in the application or website:
+
+{{ token }}
+
+Sincerely,
+
+The IHC APP Team
+
+Note: replies to this email address are not monitored.

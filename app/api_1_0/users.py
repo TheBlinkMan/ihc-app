@@ -5,6 +5,7 @@ from flask_login import current_user
 from .errors import bad_request, unauthorized, forbidden
 from .. import db, auth
 from .decorators import admin_required
+from ..email import send_email
 
 @api.route('/users/', methods=['GET'])
 @auth.login_required
@@ -66,3 +67,12 @@ def update_user(id):
     db.session.add(user)
     db.session.commit()
     return jsonify(user.to_json()), 200
+
+@api.route('/confirm/', methods = ['GET'])
+@auth.login_required
+def get_confirmation_token():
+    if g.current_user.confirmed:
+        return bad_request('User already confirmed his account')
+    user = g.current_user
+    send_email(user.email, 'Confirm your account', 'email/confirm', user = user, token = user.generate_confirmation_token().decode('ascii'))
+    return jsonify({'message': 'A confirmation message was sent to you by email.'}), 200
