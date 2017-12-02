@@ -4,7 +4,6 @@ basedir = os.path.abspath(os.path.dirname(__file__))
 
 class Config:
     SECRET_KEY = os.environ.get('SECRET_KEY') or 'hard to guess string'
-    SERVER_NAME = 'localhost:5000'
     SQLALCHEMY_COMMIT_ON_TEARDOWN = True
     SQLALCHEMY_TRACK_MODIFICATIONS = True
 
@@ -15,6 +14,9 @@ class Config:
     MAIL_USE_TLS = True
     MAIL_DEFAULT_SENDER = os.environ.get('MAIL_DEFAULT_SENDER')
     MAIL_SUBJECT_PREFIX = '[IHC-APP]'
+
+    UPLOAD_FOLDER = 'upload/images'
+    MAX_CONTENT_LENGTH = 16 * 1024 * 1024
 
     @staticmethod
     def init_app(app):
