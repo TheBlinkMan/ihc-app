@@ -74,6 +74,14 @@ Content:
 ##### If the authentication and authorization are correct and the requested id doesn't match any user in the database
 Status Code: 404
 
+Content:
+```
+{
+    "error": "Not Found",
+    "message": "Resource Not Found"
+}
+```
+
 ##### If the user does not send the authentication token
 
 Status Code: 401
@@ -227,6 +235,14 @@ Content:
 
 Status Code: 404
 
+Content:
+```
+{
+    "error": "Not Found",
+    "message": "Resource Not Found"
+}
+```
+
 #### Sample Call
 #### Notes
 
@@ -285,6 +301,14 @@ Content-Type: image/[file-format]
 ##### If the requested id doesn't match any image in the database
 
 Status Code: 404
+
+Content:
+```
+{
+    "error": "Not Found",
+    "message": "Resource Not Found"
+}
+```
 
 #### Sample Call
 #### Notes
@@ -372,6 +396,14 @@ Content:
 
 Status Code: 404
 
+Content:
+```
+{
+    "error": "Not Found",
+    "message": "Resource Not Found"
+}
+```
+
 #### Sample Call
 #### Notes
 
@@ -438,6 +470,14 @@ Content:
 
 Status Code: 404
 
+Content:
+```
+{
+    "error": "Not Found",
+    "message": "Resource Not Found"
+}
+```
+
 #### Sample Call
 #### Notes
 
@@ -469,6 +509,14 @@ Content:
 #### Error Response
 ##### If the authentication and authorization are correct and the requested id doesn't match any message in the database
 Status Code: 404
+
+Content:
+```
+{
+    "error": "Not Found",
+    "message": "Resource Not Found"
+}
+```
 
 ##### If the user does not send the authentication token
 
@@ -568,6 +616,14 @@ Content:
 
 Status Code: 404
 
+Content:
+```
+{
+    "error": "Not Found",
+    "message": "Resource Not Found"
+}
+```
+
 #### Sample Call
 #### Notes
 
@@ -633,6 +689,15 @@ Content:
 #### Error Response
 ##### If the requested id doesn't match any virtual learning environments in the database
 Status Code: 404
+
+Content:
+```
+{
+    "error": "Not Found",
+    "message": "Resource Not Found"
+}
+```
+
 #### Sample Call
 #### Notes
 
@@ -707,6 +772,15 @@ Content:
 ##### If the authentication and authorization are correct(The user is an administrator) and the requested id doesn't match any vle in the database
 
 Status Code: 404
+
+Content:
+```
+{
+    "error": "Not Found",
+    "message": "Resource Not Found"
+}
+```
+
 
 #### Sample Call
 #### Notes
