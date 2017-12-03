@@ -1,7 +1,6 @@
 from . import api
 from ..models import User, AnonymousUser, Role, get_role_by_email
 from flask import g, jsonify, request, url_for
-from flask_login import current_user
 from .errors import bad_request, unauthorized, forbidden
 from .. import db, auth
 from .decorators import admin_required
@@ -76,3 +75,8 @@ def get_confirmation_token():
     user = g.current_user
     send_email(user.email, 'Confirm your account', 'email/confirm', user = user, token = user.generate_confirmation_token().decode('ascii'))
     return jsonify({'message': 'A confirmation message was sent to you by email.'}), 200
+
+@api.route('/currentuser', methods=['GET'])
+@auth.login_required
+def get_current_user():
+    return jsonify(g.current_user.to_json()), 200

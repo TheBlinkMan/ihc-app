@@ -246,6 +246,40 @@ Content:
 #### Sample Call
 #### Notes
 
+## Get Current User
+#### URL
+    /currentuser/
+#### METHOD
+    GET
+#### URL Params
+#### Data Params
+#### Success Response
+##### Header
+Status Code: 200
+
+Content:
+```
+{
+    uri : [string],
+    id : [integer],
+    name : [string],
+    email : [string],
+    role : [string],
+    confirmed : [boolean],
+    lattes : [string]
+}
+```
+
+#### Error Response
+
+##### If the user does not send the authorization token
+
+Status Code: 401
+
+#### Sample Call
+#### Notes
+##### The user must have to send the authentication token in the Authorization header
+
 ## Generate Confirmation Token
 #### URL
     /confirm/
