@@ -18,6 +18,8 @@ class Config:
     UPLOAD_FOLDER = os.path.join(basedir, 'app/upload/images')
     MAX_CONTENT_LENGTH = 16 * 1024 * 1024
 
+    ADMIN_EMAIL = os.environ.get('ADMIN_EMAIL')
+
     @staticmethod
     def init_app(app):
         pass

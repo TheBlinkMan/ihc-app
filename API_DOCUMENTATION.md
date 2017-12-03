@@ -440,3 +440,133 @@ Status Code: 404
 
 #### Sample Call
 #### Notes
+
+## Get Message By Id
+#### URL
+    /messages/<int:id>/
+#### METHOD
+    GET
+#### URL Params
+    [integer] id
+#### Data Params
+#### Success Response
+##### Header
+Status Code: 200
+
+Content:
+```
+{
+    {
+        id : [integer],
+        uri : [string],
+        name : [string],
+        last_name : [string],
+        email : [string],
+        body : [string]
+    }
+}
+```
+#### Error Response
+##### If the authentication and authorization are correct and the requested id doesn't match any message in the database
+Status Code: 404
+
+##### If the user does not send the authentication token
+
+Status Code: 401
+
+##### If the user try to access the message without being an administrator
+
+Status Code: 403
+Content:
+```
+{
+    error : forbidden,
+    message : 'Insufficient permissions'
+}
+```
+#### Sample Call
+#### Notes
+
+The user must be logged in and be a administrator
+
+## Create A Message
+#### URL
+    /messages/
+#### METHOD
+    POST
+#### URL Params
+#### Data Params
+```
+{
+    name : [string],
+    last_name : [string],
+    email : [string],
+    body : [string]
+}
+```
+#### Success Response
+##### Header
+Status Code: 201
+Location: /messages/id -- id of the created message
+
+Content:
+```
+{
+    message : [string] "The message was sent to the course staff."
+}
+```
+
+#### Error Response
+
+##### If the email in the json payload is not a valid email
+
+Status Code: 400
+Content:
+```
+{
+    error : bad request,
+    message : Invalid email.
+}
+```
+
+##### If there are missing parameters(or parameters with invalid input) in the json payload.
+
+Status Code: 400
+
+Content:
+```
+{
+    error : bad request,
+    message : Invalid parameters
+}
+```
+
+#### Sample Call
+#### Notes
+
+## Delete Message
+#### URL
+    /messages/<int:id>
+#### METHOD
+    DELETE
+#### URL Params
+    [integer] id
+#### Data Params
+#### Success Response
+##### Header
+Status Code: 200
+
+Content:
+```
+{
+    message : [string] "The message was deleted."
+}
+```
+#### Error Response
+
+##### If the authentication and authorization are correct(The user is an administrator) and the requested id doesn't match any message in the database
+
+Status Code: 404
+
+#### Sample Call
+#### Notes

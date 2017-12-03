@@ -219,3 +219,46 @@ class Image(db.Model):
                 'creation_date' : self.creation_date
         }
         return image_json
+
+class Message(db.Model):
+    __tablename__ = 'messages'
+
+    id = db.Column(db.Integer, primary_key = True)
+    name = db.Column(db.String(64), nullable = False)
+    last_name = db.Column(db.String(64))
+    email = db.Column(db.String(128), nullable = False)
+    body = db.Column(db.Text, nullable = False)
+
+    @staticmethod
+    def from_json(message_json):
+        name = message_json.get('name')
+        last_name = message_json.get('last_name')
+        body = message_json.get('body')
+        email = message_json.get('email')
+
+        # (TODO)Change to not operation using falsy values
+        if (name == '' or name == None or
+                last_name == '' or last_name == None or
+                body == '' or body == None or
+                email == '' or email == None):
+            raise ValidationError('Invalid or missing parameters')
+        if not is_email_address(email):
+            raise ValidationError('Invalid email')
+        message = Message()
+        message.name = name
+        message.last_name = last_name
+        message.email = email
+        message.body = body
+
+        return message
+
+    def to_json(self):
+        image_json = {
+                "id" : self.id,
+                "uri" : url_for('api.get_message', id = self.id, _external = True),
+                "name" : self.name,
+                "last_name" : self.last_name,
+                "email" : self.email,
+                "body" : self.body
+        }
+        return image_json

@@ -1,6 +1,6 @@
 import os
 from app import create_app, db
-from app.models import User, Role, Image
+from app.models import User, Role, Image, Message
 from flask import request, abort
 import click
 from flask_migrate import Migrate, upgrade
@@ -15,7 +15,7 @@ def only_json():
 
 @app.shell_context_processor
 def make_shell_context():
-    return dict(app=app, db=db, User=User, Role=Role, Image=Image)
+    return dict(app=app, db=db, User=User, Role=Role, Image=Image, Message = Message)
 
 @app.cli.command()
 @click.option('--coverage/--no-coverage', default=False, help='Enable code coverage')
