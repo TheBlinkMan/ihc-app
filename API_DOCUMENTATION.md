@@ -570,3 +570,145 @@ Status Code: 404
 
 #### Sample Call
 #### Notes
+
+## Get Virtual Learning Environments
+#### URL
+    /vles/
+#### METHOD
+    GET
+#### URL Params
+#### Data Params
+#### Success Response
+##### Header
+Status Code: 200
+
+Content:
+```
+{
+    {
+        vles : [
+            {
+                id : [integer],
+                uri : [string],
+                name : [string],
+                link : [string],
+                author : [string] link to the author,
+                last_modified: [string],
+                creation_date: [string]
+            },
+        ]
+    }
+}
+```
+#### Error Response
+#### Sample Call
+#### Notes
+
+## Get Virtual Learning Environment By Id
+#### URL
+    /vles/<int:id>
+#### METHOD
+    GET
+#### URL Params
+    [integer] id
+#### Data Params
+#### Success Response
+##### Header
+Status Code: 200
+
+Content:
+```
+{
+    {
+        id : [integer],
+        uri : [string],
+        name : [string],
+        link : [string],
+        author : [string] link to the author,
+        last_modified: [string],
+        creation_date: [string]
+    }
+}
+```
+#### Error Response
+##### If the requested id doesn't match any virtual learning environments in the database
+Status Code: 404
+#### Sample Call
+#### Notes
+
+## Create A Virtual Learning Environment
+#### URL
+    /vles/
+#### METHOD
+    POST
+#### URL Params
+#### Data Params
+```
+{
+    name : [string],
+    link : [string]
+}
+```
+#### Success Response
+##### Header
+Status Code: 201
+Location: /vles/id -- id of the created vle
+
+Content:
+```
+{
+    id : [integer],
+    uri : [string],
+    name : [string],
+    link : [string],
+    author : [string] link to the author,
+    last_modified: [string],
+    creation_date: [string]
+}
+```
+
+#### Error Response
+
+##### If there are missing parameters(or parameters with invalid input) in the json payload.
+
+Status Code: 400
+
+Content:
+```
+{
+    error : bad request,
+    message : Invalid parameters
+}
+```
+
+#### Sample Call
+#### Notes
+
+## Delete Message
+#### URL
+    /vles/<int:id>
+#### METHOD
+    DELETE
+#### URL Params
+    [integer] id
+#### Data Params
+#### Success Response
+##### Header
+Status Code: 200
+
+Content:
+```
+{
+    message : [string] "The virtual learning environment was deleted."
+}
+```
+#### Error Response
+
+##### If the authentication and authorization are correct(The user is an administrator) and the requested id doesn't match any vle in the database
+
+Status Code: 404
+
+#### Sample Call
+#### Notes
+
+##### The user must have to be an administrator

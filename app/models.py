@@ -46,6 +46,7 @@ class User(db.Model):
     confirmed = db.Column(db.Boolean, default = False)
     role_id = db.Column(db.Integer, db.ForeignKey('roles.id'))
     images = db.relationship('Image', backref = 'uploaded_by', lazy = 'dynamic')
+    vles = db.relationship('VirtualLearningEnvironment', backref = 'author', lazy = 'dynamic')
 
     @property
     def password(self):
@@ -262,3 +263,41 @@ class Message(db.Model):
                 "body" : self.body
         }
         return image_json
+
+class VirtualLearningEnvironment(db.Model):
+    __tablename__ = 'vles'
+
+    id = db.Column(db.Integer, primary_key = True)
+    name = db.Column(db.String(128), nullable = False)
+    link = db.Column(db.String(256), nullable = False)
+    author_id = db.Column(db.Integer, db.ForeignKey('users.id'))
+
+    last_modified = db.Column(db.DateTime(), default=datetime.utcnow)
+    creation_date = db.Column(db.DateTime(), default=datetime.utcnow)
+
+    @staticmethod
+    def from_json(vle_json):
+        name = vle_json.get('name')
+        link = vle_json.get('link')
+
+        if name == '' or name == None or link == '' or link == None:
+            raise ValidationError('Invalid parameters')
+
+        # (TODO)verify if the link is valid
+
+        vle = VirtualLearningEnvironment()
+        vle.name = name
+        vle.link = link
+        return vle
+
+    def to_json(self):
+        vle_json = {
+                "id" : self.id,
+                "uri" : url_for('api.get_vle', id = self.id, _external = True),
+                "name" : self.name,
+                "link" : self.link,
+                "author": url_for('api.get_user', id = self.author_id, _external=True),
+                "last_modified" : self.last_modified,
+                "creation_date" : self.creation_date
+        }
+        return vle_json
