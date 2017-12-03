@@ -31,3 +31,16 @@ quit()
 ```
 FLASK_APP=webapp.py flask test
 ```
+
+#### how to build and run docker image:
+##### First edit the Dockerfile and change the environment variables values
+MAIL_DEFAULT_SENDER
+MAIL_USERNAME  (only gmail for now)
+MAIL_PASSWORD
+ADMIN_EMAIL
+
+##### Lastly execute these commands:
+```
+docker build -t ihcapp .
+docker run -d -p 8080:5000 ihcapp
+```
