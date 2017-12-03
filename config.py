@@ -15,7 +15,7 @@ class Config:
     MAIL_DEFAULT_SENDER = os.environ.get('MAIL_DEFAULT_SENDER')
     MAIL_SUBJECT_PREFIX = '[IHC-APP]'
 
-    UPLOAD_FOLDER = 'upload/images'
+    UPLOAD_FOLDER = os.path.join(basedir, 'app/upload/images')
     MAX_CONTENT_LENGTH = 16 * 1024 * 1024
 
     @staticmethod

@@ -6,6 +6,9 @@ from flask_login import current_user, AnonymousUserMixin
 from itsdangerous import TimedJSONWebSignatureSerializer as Serializer
 from flask import url_for, current_app
 from .exceptions import ValidationError
+from datetime import datetime
+from werkzeug.utils import secure_filename
+from .file_utility import allowed_file
 
 INSTITUTIONAL_EMAIL_REGEX = re.compile(r"(^[a-zA-Z0-9_.+-]+@(estudante\.)?ifb\.edu\.br$)")
 STUDENT_EMAIL_REGEX = re.compile(r"(^[a-zA-Z0-9_.+-]+@estudante\.ifb\.edu\.br$)")
@@ -42,6 +45,7 @@ class User(db.Model):
     lattes = db.Column(db.String(256), unique=True, index=True)
     confirmed = db.Column(db.Boolean, default = False)
     role_id = db.Column(db.Integer, db.ForeignKey('roles.id'))
+    images = db.relationship('Image', backref = 'uploaded_by', lazy = 'dynamic')
 
     @property
     def password(self):
@@ -178,3 +182,40 @@ class Role(db.Model):
 
     def __repr__(self):
         return '<Role %r>' % self.name
+
+class Image(db.Model):
+    __tablename__ = 'images'
+
+    id = db.Column(db.Integer, primary_key = True)
+    filename = db.Column(db.String(128), nullable = False)
+    alternate = db.Column(db.String(512))
+    user_id = db.Column(db.Integer, db.ForeignKey('users.id'))
+    last_modified = db.Column(db.DateTime(), default=datetime.utcnow)
+    creation_date = db.Column(db.DateTime(), default=datetime.utcnow)
+
+    @staticmethod
+    def from_json(image_json):
+        filename = image_json.get('filename')
+        alternate = image_json.get('alternate')
+        if filename == '' or filename == None:
+            raise ValidationError('File must have a name')
+        filename = secure_filename(filename)
+        if not allowed_file(filename):
+            raise ValidationError('File must have the extensions: pdf, txt, jpg')
+        # test if the filename is None or the empty string and generate random filename
+        image = Image()
+        image.filename = filename
+        image.alternate = alternate
+        return image
+
+    def to_json(self):
+        image_json = {
+                'id' : self.id,
+                'uri' : url_for('api.get_image', id = self.id, _external = True),
+                'filename' : self.filename,
+                'uploaded_by' : url_for('api.get_user', id = self.id, _external = True),
+                'alternate' : self.alternate,
+                'last_modified' : self.last_modified,
+                'creation_date' : self.creation_date
+        }
+        return image_json

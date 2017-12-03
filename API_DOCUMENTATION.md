@@ -267,3 +267,176 @@ Content:
 ```
 #### Sample Call
 #### Notes
+
+## Get Image
+#### URL
+    /images/<int:id>/
+#### METHOD
+    GET
+#### URL Params
+    [integer] id
+#### Data Params
+#### Success Response
+##### Header
+Status Code: 200
+Content-Type: image/[file-format]
+#### Error Response
+
+##### If the requested id doesn't match any image in the database
+
+Status Code: 404
+
+#### Sample Call
+#### Notes
+
+
+## Create Image
+#### URL
+    /images/
+#### METHOD
+    POST
+#### URL Params
+#### Data Params
+```
+{
+    filename : [string],
+    image_string : [string, base64 enconded image],
+    alternate : [string]
+}
+```
+#### Success Response
+##### Header
+Status Code: 201
+Location: /images/id -- id of the created image
+
+Content:
+```
+{
+    id : [integer],
+    uri : [string],
+    filename : [string],
+    uploaded_by : [string],
+    alternate : [string],
+    last_modified : [string],
+    creation_date : [string]
+}
+```
+#### Error Response
+##### If there are missing parameters(or parameters with invalid input) in the json payload.
+
+Status Code: 400
+
+Content:
+```
+{
+    error : bad request,
+    message : Invalid parameters
+}
+```
+
+##### If the user does not send the authentication token
+
+Status Code: 401
+
+#### Sample Call
+#### Notes
+
+## Get Image Metadata
+#### URL
+    /images/<int:id>/metadata/
+#### METHOD
+    GET
+#### URL Params
+    [integer] id
+#### Data Params
+#### Success Response
+##### Header
+Status Code: 200
+
+Content:
+```
+{
+    id : [integer],
+    uri : [string],
+    filename : [string],
+    uploaded_by : [string],
+    alternate : [string],
+    last_modified : [string],
+    creation_date : [string]
+}
+```
+
+#### Error Response
+
+##### If the requested id doesn't match any image in the database
+
+Status Code: 404
+
+#### Sample Call
+#### Notes
+
+## Update Image
+#### URL
+    /images/<int:id>
+#### METHOD
+    PUT
+#### URL Params
+    [integer] id
+#### Data Params
+##### Note: All parameters (key-value pair) are optional.
+```
+{
+    filename : [string],
+    image_string : [string, base64 encoded image]
+    alternate : [string],
+}
+```
+#### Success Response
+##### Header
+Status Code: 200
+
+Content:
+```
+{
+    id : [integer],
+    uri : [string],
+    filename : [string],
+    uploaded_by : [string],
+    alternate : [string],
+    last_modified : [string],
+    creation_date : [string]
+}
+```
+
+#### Error Response
+
+##### If the user try to update an image that he didn't uploaded without being an administrator
+
+Status Code: 403
+
+Content:
+```
+{
+    error : forbidden,
+    message : Insufficient credentials
+}
+```
+
+##### If there are parameters with invalid input in the json payload.
+
+Status Code: 400
+
+Content:
+```
+{
+    error : bad request,
+    message : Invalid parameters
+}
+```
+
+##### If the authentication and authorization are correct and the requested id doesn't match any image in the database
+
+Status Code: 404
+
+#### Sample Call
+#### Notes
