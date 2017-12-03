@@ -3,6 +3,7 @@ import json
 from app import create_app, db
 from app.models import User, Role
 from flask import url_for
+from app.api_1_0 import api
 
 class AuthTestCase(unittest.TestCase):
 
@@ -10,6 +11,8 @@ class AuthTestCase(unittest.TestCase):
         self.app = create_app('testing')
         self.app_context = self.app.app_context()
         self.app_context.push()
+        self._ctx = self.app.test_request_context()
+        self._ctx.push()
         db.create_all()
         Role.insert_roles()
         self.client = self.app.test_client()
