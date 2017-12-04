@@ -1,4 +1,5 @@
 # API Documentation Version 1.0
+# All routes in this version of the api have the prefix: '/api/v1.0/'
 
 ## Get All Users
 #### URL
