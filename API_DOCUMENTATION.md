@@ -804,3 +804,469 @@ Content:
 #### Notes
 
 ##### The user must have to be an administrator
+
+
+## Get Campuses
+#### URL
+    /campuses/
+#### METHOD
+    GET
+#### URL Params
+#### Data Params
+#### Success Response
+##### Header
+Status Code: 200
+
+Content:
+```
+{
+    campuses : [
+        {
+            uri : [string],
+            id : [integer],
+            name : [string],
+            localization : [string],
+            contacts : [string] url
+        },
+    ]
+}
+```
+#### Error Response
+#### Sample Call
+#### Notes
+
+## Get Campus
+#### URL
+    /campuses/<int:id>
+#### METHOD
+    GET
+#### URL Params
+    [integer] id
+#### Data Params
+#### Success Response
+##### Header
+Status Code: 200
+
+Content:
+```
+{
+    uri : [string],
+    id : [integer],
+    name : [string],
+    localization : [string],
+    contacts : [string] url
+}
+```
+#### Error Response
+##### If the requested id doesn't match any campus in the database
+Status Code: 404
+
+Content:
+```
+{
+    "error": "Not Found",
+    "message": "Resource Not Found"
+}
+```
+
+#### Sample Call
+#### Notes
+
+## Create Campus
+#### URL
+    /campuses/
+#### METHOD
+    POST
+#### URL Params
+#### Data Params
+```
+{
+    name : [string],
+    localization : [string]
+}
+```
+#### Success Response
+##### Header
+Status Code: 201
+
+Content:
+```
+{
+    uri : [string],
+    id : [integer],
+    name : [string],
+    localization : [string],
+    contacts : [string] url
+}
+```
+#### Error Response
+##### If the user does not send the authorization token
+
+Status Code: 401
+
+##### If the user does send the authorization token but do not have administer permissions
+
+Status Code: 403
+Content:
+{
+    error : forbidden,
+    message : 'Insufficient permissions'
+}
+
+#### Sample Call
+#### Notes
+The user must be logged in and be a administrator
+
+## Update Campus
+#### URL
+    /campuses/<int:id>
+#### METHOD
+    PUT
+#### URL Params
+#### Data Params
+```
+{
+    name : [string],
+    localization : [string]
+}
+```
+#### Success Response
+##### Header
+Status Code: 200
+
+Content:
+```
+{
+    uri : [string],
+    id : [integer],
+    name : [string],
+    localization : [string],
+    contacts : [string] url
+}
+```
+#### Error Response
+##### If the user does not send the authorization token
+
+Status Code: 401
+
+##### If the user does send the authorization token but do not have administer permissions
+
+Status Code: 403
+Content:
+{
+    error : forbidden,
+    message : 'Insufficient permissions'
+}
+
+#### Sample Call
+#### Notes
+The user must be logged in and be a administrator
+
+## Delete Campus
+#### URL
+    /campuses/<int:id>
+#### METHOD
+    DELETE
+#### URL Params
+#### Data Params
+#### Success Response
+##### Header
+Status Code: 200
+
+Content:
+```
+{
+    message : [string] "The campus was deleted."
+}
+```
+#### Error Response
+##### If the user does not send the authorization token
+
+Status Code: 401
+
+##### If the user does send the authorization token but do not have administer permissions
+
+Status Code: 403
+Content:
+{
+    error : forbidden,
+    message : 'Insufficient permissions'
+}
+
+#### Sample Call
+#### Notes
+The user must be logged in and be a administrator
+
+## Get All Contacts 
+#### URL
+    /contacts/
+#### METHOD
+    GET
+#### URL Params
+#### Data Params
+#### Success Response
+##### Header
+Status Code: 200
+
+Content:
+```
+{
+    "contacts": [
+        {
+            id : [integer],
+            uri : [string],
+            description : [string],
+            telephone_number : [string],
+            email : [string],
+            campus : [string] url,
+        },
+    ]
+}
+```
+#### Error Response
+
+##### If the requested id doesn't match any contact in the database
+Status Code: 404
+
+Content:
+```
+{
+    "error": "Not Found",
+    "message": "Resource Not Found"
+}
+```
+
+#### Sample Call
+#### Notes
+
+## Get Contact
+#### URL
+    /contacts/<int:id>
+#### METHOD
+    GET
+#### URL Params
+    [integer] id
+#### Data Params
+#### Success Response
+##### Header
+Status Code: 200
+
+Content:
+```
+{
+    id : [integer],
+    uri : [string],
+    description : [string],
+    telephone_number : [string],
+    email : [string],
+    campus : [string] url,
+}
+```
+#### Error Response
+
+##### If the requested id doesn't match any contact in the database
+Status Code: 404
+
+Content:
+```
+{
+    "error": "Not Found",
+    "message": "Resource Not Found"
+}
+```
+
+#### Sample Call
+#### Notes
+
+## Update Contact
+#### URL
+    /contacts/<int:id>
+#### METHOD
+    PUT
+#### URL Params
+    [integer] id
+#### Data Params
+```
+{
+    description : [string],
+    telephone_number : [string],
+    email : [string]
+}
+```
+#### Success Response
+##### Header
+Status Code: 200
+
+Content:
+```
+{
+    id : [integer],
+    uri : [string],
+    description : [string],
+    telephone_number : [string],
+    email : [string],
+    campus : [string] url,
+}
+```
+#### Error Response
+
+##### If the requested id doesn't match any contact in the database
+Status Code: 404
+
+Content:
+```
+{
+    "error": "Not Found",
+    "message": "Resource Not Found"
+}
+```
+
+#### Sample Call
+#### Notes
+
+## Delete Contact
+#### URL
+    /contacts/<int:id>
+#### METHOD
+    DELETE
+#### URL Params
+    [integer] id
+#### Data Params
+#### Success Response
+##### Header
+Status Code: 200
+
+Content:
+```
+{
+    message : [string] "The contact was deleted."
+}
+```
+
+#### Error Response
+
+##### If the requested id doesn't match any contact in the database
+Status Code: 404
+
+Content:
+```
+{
+    "error": "Not Found",
+    "message": "Resource Not Found"
+}
+```
+
+##### If the user does not send the authorization token
+
+Status Code: 401
+
+##### If the user does send the authorization token but do not have administer permissions
+
+Status Code: 403
+Content:
+{
+    error : forbidden,
+    message : 'Insufficient permissions'
+}
+
+#### Sample Call
+#### Notes
+
+## Create Campus Contact
+#### URL
+    /campuses/<int:id>/contacts/
+#### METHOD
+    POST
+#### URL Params
+    [integer] id -- campus id
+#### Data Params
+#### Success Response
+##### Header
+Status Code: 201
+Location: /contacts/id/ -- id of the created contact
+
+Content:
+```
+{
+    id : [integer],
+    uri : [string],
+    description : [string],
+    telephone_number : [string],
+    email : [string],
+    campus : [string] url,
+}
+```
+
+#### Error Response
+
+##### If the requested id doesn't match any campus in the database
+Status Code: 404
+
+Content:
+```
+{
+    "error": "Not Found",
+    "message": "Resource Not Found"
+}
+```
+
+##### If the user does not send the authorization token
+
+Status Code: 401
+
+##### If the user does send the authorization token but do not have administer permissions
+
+Status Code: 403
+Content:
+{
+    error : forbidden,
+    message : 'Insufficient permissions'
+}
+
+#### Sample Call
+#### Notes
+The user must be logged in and be a administrator
+
+## Get Campus Contacts
+#### URL
+    /campuses/<int:id>/contacts/
+#### METHOD
+    GET
+#### URL Params
+    [integer] id -- campus id
+#### Data Params
+#### Success Response
+##### Header
+Status Code: 200
+
+Content:
+```
+{
+    "contacts": [
+        {
+            id : [integer],
+            uri : [string],
+            description : [string],
+            telephone_number : [string],
+            email : [string],
+            campus : [string] url,
+        },
+    ]
+}
+```
+
+#### Error Response
+
+##### If the requested id doesn't match any campus in the database
+Status Code: 404
+
+Content:
+```
+{
+    "error": "Not Found",
+    "message": "Resource Not Found"
+}
+```
+
+#### Sample Call
+#### Notes

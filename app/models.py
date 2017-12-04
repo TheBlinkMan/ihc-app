@@ -301,3 +301,77 @@ class VirtualLearningEnvironment(db.Model):
                 "creation_date" : self.creation_date
         }
         return vle_json
+
+class Campus(db.Model):
+    __tablename__ = 'campuses'
+
+    id = db.Column(db.Integer, primary_key = True)
+    name = db.Column(db.String(128), nullable = False)
+    localization = db.Column(db.String(256), nullable = False)
+    contacts = db.relationship('Contact', backref = 'campus', lazy = 'dynamic')
+
+    @staticmethod
+    def from_json(campus_json):
+        name = campus_json.get('name')
+        localization = campus_json.get('localization')
+        if name == '' or name == None:
+            raise ValidationError('Invalid arguments or parameters')
+
+        campus = Campus()
+
+        campus.name = name
+        campus.localization = localization
+
+        return campus
+
+    def to_json(self):
+        campus_json = {
+                "id" : self.id,
+                "uri" : url_for('api.get_campus', id=self.id, _external = True),
+                "contacts" : url_for('api.get_campus_contacts', id=self.id, _external = True),
+                "name" : self.name,
+                "localization" : self.localization
+        }
+
+        return campus_json
+
+class Contact(db.Model):
+    __tablename__ = 'contacts'
+
+    id = db.Column(db.Integer, primary_key = True)
+    description = db.Column(db.String(128), nullable = False)
+    telephone_number = db.Column(db.String(64))
+    email = db.Column(db.String(128))
+    campus_id = db.Column(db.Integer, db.ForeignKey('campuses.id')) 
+
+    @staticmethod
+    def from_json(contact_json):
+        description = contact_json.get('description')
+        telephone_number = contact_json.get('telephone_number')
+        email = contact_json.get('email')
+
+        if (description == '' or description == None or
+            telephone_number == '' or telephone_number == None):
+            raise ValidationError('Invalid arguments or parameters')
+
+        # (TODO) validate telephone number
+        if email != None and email != '' and not is_email_address(email):
+            raise ValidationError('Invalid email')
+
+        contact = Contact()
+        contact.description = description
+        contact.telephone_number = telephone_number
+        contact.email = email
+
+        return contact
+
+    def to_json(self):
+        contact_json = {
+                "id" : self.id,
+                "uri" : url_for('api.get_contact', id=self.id, _external=True),
+                "description" : self.description,
+                "telephone_number" : self.telephone_number,
+                "email" : self.email,
+                "campus" : url_for('api.get_campus', id=self.campus_id, _external=True)
+        }
+        return contact_json
