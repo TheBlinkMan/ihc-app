@@ -46,7 +46,7 @@ The user must be logged in and be a administrator
 
 ## Get User By Id
 #### URL
-    /users/<int:id>/
+    /users/<int:id>
 #### METHOD
     GET
 #### URL Params
@@ -71,7 +71,7 @@ Content:
 }
 ```
 #### Error Response
-##### If the authentication and authorization are correct and the requested id doesn't match any user in the database
+##### If the requested id doesn't match any user in the database
 Status Code: 404
 
 Content:
@@ -82,24 +82,8 @@ Content:
 }
 ```
 
-##### If the user does not send the authentication token
-
-Status Code: 401
-
-##### If the user try to access the information of another user without being an administrator
-
-Status Code: 403
-Content:
-```
-{
-    error : forbidden,
-    message : 'Insufficient credentials'
-}
-```
 #### Sample Call
 #### Notes
-The user must be logged in and be a administrator or
-the user he is trying to access
 
 ## Create User
 #### URL
@@ -172,7 +156,7 @@ Content:
 
 ## Update User
 #### URL
-    /users/<int:id>/
+    /users/<int:id>
 #### METHOD
     PUT
 #### URL Params
@@ -282,7 +266,7 @@ Status Code: 401
 
 ## Generate Confirmation Token
 #### URL
-    /confirm/
+    /confirm
 #### METHOD
     GET
 #### URL Params

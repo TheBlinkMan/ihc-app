@@ -12,13 +12,10 @@ from ..email import send_email
 def get_users():
     return jsonify({'users': [user.to_json() for user in User.query.all()]})
 
-@api.route('/users/<int:id>/', methods=['GET'])
-@auth.login_required
+@api.route('/users/<int:id>', methods=['GET'])
 def get_user(id):
-    if g.current_user.id == id or g.current_user.is_administrator():
-        requested_user = User.query.get_or_404(id)
-        return jsonify(requested_user.to_json()), 200
-    return forbidden('Insufficient credentials')
+    requested_user = User.query.get_or_404(id)
+    return jsonify(requested_user.to_json()), 200
 
 @api.route('/users/', methods=['POST'])
 def create_user():
@@ -28,7 +25,7 @@ def create_user():
     return jsonify(user.to_json()), 201, \
         {'Location': url_for('api.get_user', id=user.id, _external=True)}
 
-@api.route('/users/<int:id>/', methods=['PUT'])
+@api.route('/users/<int:id>', methods=['PUT'])
 @auth.login_required
 def update_user(id):
 
@@ -67,7 +64,7 @@ def update_user(id):
     db.session.commit()
     return jsonify(user.to_json()), 200
 
-@api.route('/confirm/', methods = ['GET'])
+@api.route('/confirm', methods = ['GET'])
 @auth.login_required
 def get_confirmation_token():
     if g.current_user.confirmed:
