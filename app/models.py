@@ -48,6 +48,8 @@ class User(db.Model):
     images = db.relationship('Image', backref = 'uploaded_by', lazy = 'dynamic')
     vles = db.relationship('VirtualLearningEnvironment', backref = 'author', lazy = 'dynamic')
     news = db.relationship('News', backref = 'author', lazy = 'dynamic')
+    documents = db.relationship('Document', backref = 'uploaded_by', lazy = 'dynamic')
+    opportunities = db.relationship('Opportunity', backref = 'author', lazy = 'dynamic')
 
     @property
     def password(self):
@@ -196,6 +198,7 @@ class Image(db.Model):
     creation_date = db.Column(db.DateTime(), default=datetime.utcnow)
 
     news_id = db.Column(db.Integer, db.ForeignKey('news.id'))
+    opportunity_id = db.Column(db.Integer, db.ForeignKey('opportunities.id'))
 
     @staticmethod
     def from_json(image_json):
@@ -217,7 +220,7 @@ class Image(db.Model):
                 'id' : self.id,
                 'uri' : url_for('api.get_image', id = self.id, _external = True),
                 'filename' : self.filename,
-                'uploaded_by' : url_for('api.get_user', id = self.id, _external = True),
+                'uploaded_by' : url_for('api.get_user', id = self.user_id, _external = True),
                 'alternate' : self.alternate,
                 'last_modified' : self.last_modified,
                 'creation_date' : self.creation_date
@@ -423,3 +426,178 @@ class News(db.Model):
         }
 
         return news_json
+
+class Program(db.Model):
+    __tablename__ = 'programs'
+
+    id = db.Column(db.Integer, primary_key = True)
+    name = db.Column(db.String(256), nullable = False)
+    description = db.Column(db.Text)
+
+    courses = db.relationship('Course', backref='program', lazy='dynamic')
+
+    @staticmethod
+    def from_json(program_json):
+        name = program_json.get('name')
+        description = program_json.get('description')
+
+        # Validation
+
+        program = Program()
+        program.name = name
+        program.description = description
+
+        return program
+
+    def to_json(self):
+        program_json = {
+                "id" : self.id,
+                "uri" : url_for('api.get_course', id=self.id, _external=True),
+                "name" : self.name,
+                "description" : self.description
+        }
+
+        return program_json
+
+class Course(db.Model):
+    __tablename__ = 'courses'
+
+    id = db.Column(db.Integer, primary_key = True)
+    name = db.Column(db.String(256), nullable = False)
+    class_hours = db.Column(db.Integer)
+    weekly_meetings = db.Column(db.Integer)
+    term_load = db.Column(db.Integer)
+    acronym = db.Column(db.String(10))
+
+    program_id = db.Column(db.Integer, db.ForeignKey('programs.id'))
+    documents = db.relationship('Document', backref='course', lazy='dynamic')
+
+    @staticmethod
+    def from_json(course_json):
+        name = course_json.get('name')
+        class_hours = course_json.get('class_hours')
+        weekly_meetings = course_json.get('weekly_meetings')
+        term_load = course_json.get('term_load')
+        acronym = course_json.get('acronym')
+
+        # Validate
+
+        course = Course()
+        course.name = name
+        course.class_hours = class_hours
+        course.weekly_meetings = weekly_meetings
+        course.term_load = term_load
+        course.acronym = acronym
+
+        return course
+
+    def to_json(self):
+        course_json = {
+                "id" : self.id,
+                "uri" : url_for('api.get_course', id = self.id, _external = True),
+                "name" : self.name,
+                "class_hours" : self.class_hours,
+                "weekly_meetings" : self.weekly_meetings,
+                "term_load" : self.term_load,
+                "acronym" : self.acronym,
+                "program" : url_for('api.get_program', id=self.program_id, _external=True)
+        }
+        return course_json
+
+class Document(db.Model):
+    __tablename__ = 'documents'
+
+    id = db.Column(db.Integer, primary_key = True)
+    name = db.Column(db.String(128), nullable = False)
+    filename = db.Column(db.String(128), nullable = False)
+
+    uploader_id = db.Column(db.Integer, db.ForeignKey('users.id'))
+    last_modified = db.Column(db.DateTime(), default=datetime.utcnow)
+    creation_date = db.Column(db.DateTime(), default=datetime.utcnow)
+
+    course_id = db.Column(db.Integer, db.ForeignKey('courses.id'))
+
+    @staticmethod
+    def from_json(image_json):
+        name = image_json.get('name')
+        filename = image_json.get('filename')
+
+        if name == '' or name == None:
+            raise ValidationError('File must have a descriptive name')
+
+        if filename == '' or filename == None:
+            raise ValidationError('File must have a name')
+
+        filename = secure_filename(filename)
+
+        if not allowed_file(filename):
+            raise ValidationError('File must have the extensions: pdf, txt, jpg')
+
+        # test if the filename is None or the empty string and generate random filename
+        document = Document()
+        document.name = name
+        document.filename = filename
+        return document
+
+    def to_json(self):
+        image_json = {
+                'id' : self.id,
+                'uri' : url_for('api.get_document', id = self.id, _external = True),
+                'name' : self.name,
+                'filename' : self.filename,
+                'uploaded_by' : url_for('api.get_user', id = self.uploader_id, _external = True),
+                'last_modified' : self.last_modified,
+                'creation_date' : self.creation_date,
+        }
+        return image_json
+
+class Opportunity(db.Model):
+    __tablename__ = 'opportunities'
+
+    id = db.Column(db.Integer, primary_key = True)
+    title = db.Column(db.String(256), nullable = False)
+    institution = db.Column(db.String(256), nullable = False)
+    vacancies_amount = db.Column(db.Integer)
+    published = db.Column(db.Boolean, default = False)
+    link = db.Column(db.String(256))
+    description = db.Column(db.Text)
+
+    author_id = db.Column(db.Integer, db.ForeignKey('users.id'))
+
+    opportunities = db.relationship('Image', backref='opportunity', lazy='dynamic')
+
+    @staticmethod
+    def from_json(opportunity_json):
+
+        title = opportunity_json.get('title')
+        institution = opportunity_json.get('institution')
+        vacancies_amount = opportunity_json.get('vacancies_amount')
+        link = opportunity_json.get('link')
+        description = opportunity_json.get('description')
+
+
+        # (TODO) Validate
+
+        opportunity = Opportunity()
+        opportunity.title = title
+        opportunity.institution = institution
+        opportunity.vacancies_amount = vacancies_amount
+        opportunity.link = link
+        opportunity.description = description
+
+        return opportunity
+
+    def to_json(self):
+        opportunity_json = {
+                "id" : self.id,
+                "uri" : url_for('api.get_opportunity', id = self.id, _external = True),
+                "title" : self.title,
+                "institution" : self.class_hours,
+                "vacancies_amount" : self.weekly_meetings,
+                "link" : self.link,
+                "description" : self.description,
+                "published" : self.published,
+                "images" : url_for('api.get_opportunity_images', id=self.id, _external=True),
+                "author" : url_for('api.get_user', id=self.author_id, _external=True)
+        }
+        return opportunity_json

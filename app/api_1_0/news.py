@@ -6,11 +6,11 @@ from .. import db, auth
 
 @api.route('/news/')
 def get_news_items():
-    return jsonify({"news:" : [news_item.to_json() for news_item in News.query.all()]})
-
-@api.route('/publishednews/')
-def get_published_news_items():
     return jsonify({"news:" : [news_item.to_json() for news_item in News.query.filter_by(published = True)]})
+
+@api.route('/news/suggested')
+def get_suggested_news_items():
+    return jsonify({"news:" : [news_item.to_json() for news_item in News.query.filter_by(published = False)]})
 
 @api.route('/news/<int:id>')
 def get_news_item(id):
