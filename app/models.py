@@ -47,6 +47,7 @@ class User(db.Model):
     role_id = db.Column(db.Integer, db.ForeignKey('roles.id'))
     images = db.relationship('Image', backref = 'uploaded_by', lazy = 'dynamic')
     vles = db.relationship('VirtualLearningEnvironment', backref = 'author', lazy = 'dynamic')
+    news = db.relationship('News', backref = 'author', lazy = 'dynamic')
 
     @property
     def password(self):
@@ -193,6 +194,8 @@ class Image(db.Model):
     user_id = db.Column(db.Integer, db.ForeignKey('users.id'))
     last_modified = db.Column(db.DateTime(), default=datetime.utcnow)
     creation_date = db.Column(db.DateTime(), default=datetime.utcnow)
+
+    news_id = db.Column(db.Integer, db.ForeignKey('news.id'))
 
     @staticmethod
     def from_json(image_json):
@@ -375,3 +378,48 @@ class Contact(db.Model):
                 "campus" : url_for('api.get_campus', id=self.campus_id, _external=True)
         }
         return contact_json
+
+class News(db.Model):
+    __tablename__ = 'news'
+
+    id = db.Column(db.Integer, primary_key = True) 
+    title = db.Column(db.String(256), nullable = False)
+    link = db.Column(db.String(256))
+    body = db.Column(db.Text)
+    published = db.Column(db.Boolean, default = False)
+
+    author_id = db.Column(db.Integer, db.ForeignKey('users.id')) 
+
+    images = db.relationship('Image', backref='news', lazy = 'dynamic')
+
+    @staticmethod
+    def from_json(news_json):
+        title = news_json.get('title')
+        link = news_json.get('link')
+        body = news_json.get('body')
+
+        if title == '' or title == None:
+            raise ValidationError('Invalid parameters or arguments')
+
+        # Validation
+
+        news = News()
+        news.title = title
+        news.link = link
+        news.body = body
+
+        return news
+
+    def to_json(self):
+        news_json = {
+                "id" : self.id,
+                "uri" : url_for('api.get_news_item', id=self.id, _external=True),
+                "title" : self.title,
+                "link" : self.link,
+                "body" : self.body,
+                "published" : self.published,
+                "author" : url_for('api.get_user', id=self.author_id, _external=True),
+                "images" : url_for('api.get_news_item_images', id=self.id, _external = True)
+        }
+
+        return news_json

@@ -1,5 +1,5 @@
 from . import api
-from ..models import Image
+from ..models import Image, News
 from flask import send_from_directory, current_app, g, request, jsonify, url_for
 from .authentication import auth
 from .errors import bad_request
@@ -22,6 +22,7 @@ def get_image_meta(id):
 @auth.login_required
 def create_image():
     image = Image.from_json(request.json)
+
     image.uploaded_by = g.current_user
 
     db.session.add(image)
@@ -41,7 +42,7 @@ def update_image(id):
     if image.uploaded_by != g.current_user and not g.current_user.is_administrator():
         return bad_request('Invalid credentials')
 
-    filename = request.json.get('filename')
+    filename = request.json.get('filename', image.filename)
     if not allowed_file(filename):
         return bad_request('File must have the extensions: pdf, txt, jpg')
     # check if the filename is already in use and if so generate a random filename
@@ -57,3 +58,27 @@ def update_image(id):
     db.session.commit()
 
     return jsonify(image.to_json())
+
+@api.route('/news/<int:id>/images/', methods = ['POST'])
+@auth.login_required
+def create_news_item_image(id):
+    news_item = News.query.get_or_404(id)
+
+    if news_item.author != g.current_user and not g.current_user.is_administrator():
+        return forbidden('Invalid credentials')
+
+    image = Image.from_json(request.json)
+
+    image.news = news_item
+    image.uploaded_by = g.current_user
+
+    db.session.add(image)
+    db.session.commit()
+
+    return jsonify(image.to_json()), 201, \
+            {'Location': url_for('api.get_image', id=image.id, _external=True)}
+
+@api.route('/news/<int:id>/images/')
+def get_news_item_images(id):
+    news_item = News.query.get_or_404(id)
+    return jsonify({"images" :  [url_for('api.get_image', id=image.id, _external=True) for image in news_item.images]}), 200
