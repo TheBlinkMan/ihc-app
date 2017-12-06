@@ -6,6 +6,7 @@ ENV MAIL_DEFAULT_SENDER "IHC APP <youremail@email_provider.com>"
 ENV MAIL_USERNAME youremail@email_provider.com
 ENV MAIL_PASSWORD yourpassword
 ENV ADMIN_EMAIL admin_email@email_provider.com
+ENV SECRET_KEY "put here the random secret key"
 
 RUN adduser -D ihcapp
 USER ihcapp
