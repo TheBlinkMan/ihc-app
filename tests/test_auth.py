@@ -116,7 +116,7 @@ class AuthTestCase(unittest.TestCase):
 
         with self.client:
             response = self.client.get(
-                url_for('api.get_user', id=user.id),
+                url_for('api.get_current_user', id=user.id),
                 headers=self.get_headers('wrong-token'))
             self.assertTrue(response.status_code == 401)
 
@@ -131,7 +131,7 @@ class AuthTestCase(unittest.TestCase):
             token = json_response['token']
 
             response = self.client.get(
-                    url_for('api.get_user', id=user.id),
+                    url_for('api.get_current_user', id=user.id),
                     headers=self.get_headers(token)
             )
             self.assertTrue(response.status_code == 200)

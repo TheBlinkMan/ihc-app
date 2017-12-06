@@ -156,45 +156,6 @@ class UsersTestCase(unittest.TestCase):
             response_user_id = json_response.get('id')
             self.assertTrue(response_user_id == user.id)
 
-    def test_get_user_with_different_id(self):
-        # The authenticated user id and the request id are different
-
-        email = 'john.doe@estudante.ifb.edu.br'
-        password = 'hardtoguessstring'
-        user = User()
-        user.name = 'John Doe'
-        user.email = email
-        user.password = password
-        user.lattes = 'https://lattes.au.au/johndoe'
-        user.role = get_role_by_email(user.email)
-
-        user2 = User()
-        user2.name = 'Jane Doe'
-        user2.email = 'jane.doe@ifb.edu.br'
-        user2.password = 'somestring'
-        user2.lattes = 'https://lattes.au.au/janedoe'
-        user2.role = get_role_by_email(user2.email)
-
-
-        db.session.add_all([user, user2])
-        db.session.commit()
-
-        with self.client:
-            response = self.login(email, password)
-            self.assertTrue(response.status_code == 200)
-            json_response = json.loads(response.data.decode('utf-8'))
-            self.assertIsNotNone(json_response.get('token'))
-            token = json_response['token']
-
-            self.assertTrue(user.id != user2.id)
-
-            response = self.client.get(
-                    url_for('api.get_user', id = user2.id),
-                    headers = self.get_headers(token))
-            self.assertTrue(response.status_code == 403)
-            json_response = json.loads(response.data.decode('utf-8'))
-            self.assertIsNotNone(json_response.get('message'))
-
     def test_create_user_with_blank_values(self):
         with self.client:
             response = self.client.post(
