@@ -4,6 +4,7 @@ from ..models import Campus, Contact
 from flask import jsonify, current_app, request, g, url_for
 from .. import db, auth
 from .errors import forbidden
+from ..validators import is_string_present
 
 @api.route('/contacts/')
 def get_contacts():
@@ -20,11 +21,19 @@ def get_contact(id):
 def update_contact(id):
     contact = Contact.query.get_or_404(id)
 
-    # (TODO) verify for the empty string
-    contact.description = request.json.get('description', contact.description)
-    contact.telephone_number = request.json.get('telephone_number', contact.telephone_number)
-    contact.email = request.json.get('email', contact.email)
-    # (TODO) update campus
+    description = request.json.get('description')
+    if is_string_present(description):
+        contact.description = description
+
+    telephone_number = request.json.get('telephone_number')
+    if is_string_present(telephone_number):
+        contact.telephone_number = telephone_number
+
+    email = request.json.get('email')
+    if is_string_present(email):
+        contact.email = email
+
+    # (TODO) update campus?
 
     db.session.add(contact)
     db.session.commit()

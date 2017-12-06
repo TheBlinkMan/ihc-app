@@ -4,6 +4,8 @@ from ..models import Program, Course
 from flask import jsonify, current_app, request, g, url_for
 from .. import db, auth
 from .errors import forbidden
+from ..validators import is_string_present
+from ..validators import is_integer
 
 @api.route('/courses/')
 def get_courses():
@@ -25,14 +27,38 @@ def update_course(id):
     weekly_meetings = request.json.get('weekly_meetings')
     term_load = request.json.get('term_load')
     acronym = request.json.get('acronym')
+    term = request.json.get('term')
 
-    #(TODO) VALIDATE
+    if is_string_present(name):
+        course.name = name
 
-    course.name = name
-    course.class_hours = class_hours
-    course.weekly_meetings = weekly_meetings
-    course.term_load = term_load
-    course.acronym = acronym
+    if is_string_present(acronym):
+        course.acronym = acronym
+
+    if class_hours != None:
+        if is_integer(class_hours):
+            course.class_hours = class_hours
+        else:
+            return bad_request('Invalid arguments')
+
+    if term_load != None:
+        if is_integer(term_load):
+            course.term_load = term_load
+        else:
+            return bad_request('Invalid arguments')
+
+    if term != None:
+        if is_integer(term):
+            course.term = term
+        else:
+            return bad_request('Invalid arguments')
+
+
+    if weekly_meetings != None:
+        if is_integer(weekly_meetings):
+            course.weekly_meetings = weekly_meetings
+        else:
+            return bad_request('Invalid arguments')
 
 
     db.session.add(course)

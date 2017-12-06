@@ -9,28 +9,17 @@ from .exceptions import ValidationError
 from datetime import datetime
 from werkzeug.utils import secure_filename
 from .file_utility import allowed_file
-
-INSTITUTIONAL_EMAIL_REGEX = re.compile(r"(^[a-zA-Z0-9_.+-]+@(estudante\.)?ifb\.edu\.br$)")
-STUDENT_EMAIL_REGEX = re.compile(r"(^[a-zA-Z0-9_.+-]+@estudante\.ifb\.edu\.br$)")
-TEACHER_EMAIL_REGEX = re.compile(r"(^[a-zA-Z0-9_.+-]+@ifb\.edu\.br$)")
-EMAIL_REGEX = re.compile(r"(^(([^<>()\[\]\\.,;:\s@]+(\.[^<>()\[\]\\.,;:\s@]+)*)|(.+))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$)")
-
-def is_email_address_institutional(email):
-    if INSTITUTIONAL_EMAIL_REGEX.match(email): # will return True or None
-        return True
-    return False
-
-def is_email_address(email):
-    if EMAIL_REGEX.match(email): # will return True or None
-        return True
-    return False
+from .validators import is_email_address
+from .validators import is_email_address_institutional
+from .validators import is_email_address_student
+from .validators import is_teacher_email
 
 def get_role_by_email(email):
-    if STUDENT_EMAIL_REGEX.match(email):
+    if is_email_address_student(email):
         return Role.query.filter_by(name = 'Student').first()
     #(TODO)
     #Add here a string test to give the administrator role to the right emails
-    elif TEACHER_EMAIL_REGEX.match(email):
+    elif is_teacher_email(email):
         return Role.query.filter_by(name = 'Teacher').first()
     else:
         return None
@@ -320,6 +309,7 @@ class Campus(db.Model):
     def from_json(campus_json):
         name = campus_json.get('name')
         localization = campus_json.get('localization')
+
         if name == '' or name == None:
             raise ValidationError('Invalid arguments or parameters')
 
@@ -467,6 +457,7 @@ class Course(db.Model):
     class_hours = db.Column(db.Integer)
     weekly_meetings = db.Column(db.Integer)
     term_load = db.Column(db.Integer)
+    term = db.Column(db.Integer)
     acronym = db.Column(db.String(10))
 
     program_id = db.Column(db.Integer, db.ForeignKey('programs.id'))
@@ -478,6 +469,7 @@ class Course(db.Model):
         class_hours = course_json.get('class_hours')
         weekly_meetings = course_json.get('weekly_meetings')
         term_load = course_json.get('term_load')
+        term = course_json.get('term')
         acronym = course_json.get('acronym')
 
         # Validate
@@ -488,6 +480,7 @@ class Course(db.Model):
         course.weekly_meetings = weekly_meetings
         course.term_load = term_load
         course.acronym = acronym
+        course.term = term
 
         return course
 
@@ -499,6 +492,7 @@ class Course(db.Model):
                 "class_hours" : self.class_hours,
                 "weekly_meetings" : self.weekly_meetings,
                 "term_load" : self.term_load,
+                "term" : self.term,
                 "acronym" : self.acronym,
                 "program" : url_for('api.get_program', id=self.program_id, _external=True)
         }
@@ -564,7 +558,7 @@ class Opportunity(db.Model):
 
     author_id = db.Column(db.Integer, db.ForeignKey('users.id'))
 
-    opportunities = db.relationship('Image', backref='opportunity', lazy='dynamic')
+    images = db.relationship('Image', backref='opportunity', lazy='dynamic')
 
     @staticmethod
     def from_json(opportunity_json):
@@ -574,6 +568,13 @@ class Opportunity(db.Model):
         vacancies_amount = opportunity_json.get('vacancies_amount')
         link = opportunity_json.get('link')
         description = opportunity_json.get('description')
+
+
+        if title == None or title == '':
+            raise ValidationError('Invalid arguments or parameter')
+
+        if institution == None or institution == '':
+            raise ValidationError('Invalid arguments or parameter')
 
 
         # (TODO) Validate
@@ -592,8 +593,8 @@ class Opportunity(db.Model):
                 "id" : self.id,
                 "uri" : url_for('api.get_opportunity', id = self.id, _external = True),
                 "title" : self.title,
-                "institution" : self.class_hours,
-                "vacancies_amount" : self.weekly_meetings,
+                "institution" : self.institution,
+                "vacancies_amount" : self.vacancies_amount,
                 "link" : self.link,
                 "description" : self.description,
                 "published" : self.published,

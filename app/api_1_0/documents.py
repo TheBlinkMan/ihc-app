@@ -9,6 +9,10 @@ from app import db
 import os
 from datetime import datetime
 
+@api.route('/documents/')
+def get_documents():
+    return jsonify({"documents" : [document.to_json() for document in Document.query.all()]})
+
 @api.route('/documents/<int:id>')
 def get_document(id):
     document = Document.query.get_or_404(id)

@@ -4,6 +4,7 @@ from ..models import Campus
 from flask import jsonify, current_app, request, g, url_for
 from .. import db, auth
 from .errors import forbidden
+from ..validators import is_string_present
 
 @api.route('/campuses/')
 def get_campuses():
@@ -32,9 +33,13 @@ def create_campus():
 def update_campus(id):
     campus = Campus.query.get_or_404(id)
 
-    # (TODO) verify for the empty string
-    campus.name = request.json.get('name', campus.name)
-    campus.localization = request.json.get('localization', campus.localization)
+    name = request.json.get('name')
+    if is_string_present(name):
+        campus.name = name
+
+    localization = request.json.get('localization')
+    if is_string_present(localization):
+        campuse.localization = localization
 
     db.session.add(campus)
     db.session.commit()

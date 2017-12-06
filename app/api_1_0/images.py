@@ -1,5 +1,5 @@
 from . import api
-from ..models import Image, News
+from ..models import Image, News, Opportunity
 from flask import send_from_directory, current_app, g, request, jsonify, url_for
 from .authentication import auth
 from .errors import bad_request
@@ -82,3 +82,27 @@ def create_news_item_image(id):
 def get_news_item_images(id):
     news_item = News.query.get_or_404(id)
     return jsonify({"images" :  [url_for('api.get_image', id=image.id, _external=True) for image in news_item.images]}), 200
+
+@api.route('/opportunities/<int:id>/images/', methods = ['POST'])
+@auth.login_required
+def create_opportunity_image(id):
+    opportunity = Opportunity.query.get_or_404(id)
+
+    if opportunity.author != g.current_user and not g.current_user.is_administrator():
+        return forbidden('Invalid credentials')
+
+    image = Image.from_json(request.json)
+
+    image.opportunity = opportunity
+    image.uploaded_by = g.current_user
+
+    db.session.add(image)
+    db.session.commit()
+
+    return jsonify(image.to_json()), 201, \
+            {'Location': url_for('api.get_image', id=image.id, _external=True)}
+
+@api.route('/opportunities/<int:id>/images/')
+def get_opportunity_images(id):
+    opportunity = Opportunity.query.get_or_404(id)
+    return jsonify({"images" :  [url_for('api.get_image', id=image.id, _external=True) for image in opportunity.images]}), 200
