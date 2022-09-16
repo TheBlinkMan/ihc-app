@@ -16,7 +16,7 @@ idna==2.6
 itsdangerous==0.24
 Jinja2==2.9.6
 jsonify==0.5
-Mako==1.0.7
+Mako==1.2.2
 MarkupSafe==1.0
 Pygments==2.2.0
 python-dateutil==2.6.1
